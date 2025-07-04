@@ -1,17 +1,19 @@
 import { Router } from 'express';
-import Contact from '../models/contact';
+import { AppDataSource } from '../data-source';
+import { Contact } from '../entities/Contact';
 
 const router = Router();
+const repo = AppDataSource.getRepository(Contact);
 
-router.get('/', async (req, res) => {
-  const contacts = await Contact.find();
+router.get('/', async (_req, res) => {
+  const contacts = await repo.find();
   res.json(contacts);
 });
 
 router.post('/', async (req, res) => {
-  const contact = new Contact(req.body);
-  await contact.save();
-  res.status(201).json(contact);
+  const contact = repo.create(req.body);
+  const result = await repo.save(contact);
+  res.status(201).json(result);
 });
 
 export default router;
