@@ -1,17 +1,19 @@
 import { Router } from 'express';
-import Task from '../models/task';
+import { AppDataSource } from '../data-source';
+import { Task } from '../entities/Task';
 
 const router = Router();
+const repo = AppDataSource.getRepository(Task);
 
-router.get('/', async (req, res) => {
-  const tasks = await Task.find();
+router.get('/', async (_req, res) => {
+  const tasks = await repo.find();
   res.json(tasks);
 });
 
 router.post('/', async (req, res) => {
-  const task = new Task(req.body);
-  await task.save();
-  res.status(201).json(task);
+  const task = repo.create(req.body);
+  const result = await repo.save(task);
+  res.status(201).json(result);
 });
 
 export default router;
